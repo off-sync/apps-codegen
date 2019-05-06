@@ -8,11 +8,15 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Commands.WriteSourc
     public sealed class WriteSourceCommand<TCompilationUnit> :
         AbstractCommand<WriteSourceModel<TCompilationUnit>>
     {
-        private readonly ISourceWriter<TCompilationUnit> _sourceWriter;
+        private readonly ICodeCompiler<TCompilationUnit> _codeCompiler;
+
+        private readonly ISourceWriter _sourceWriter;
 
         public WriteSourceCommand(
-            ISourceWriter<TCompilationUnit> sourceWriter)
+            ICodeCompiler<TCompilationUnit> codeCompiler,
+            ISourceWriter sourceWriter)
         {
+            _codeCompiler = codeCompiler ?? throw new ArgumentNullException(nameof(codeCompiler));
             _sourceWriter = sourceWriter ?? throw new ArgumentNullException(nameof(sourceWriter));
         }
 
@@ -21,9 +25,12 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Commands.WriteSourc
         {
             foreach (var compilationUnit in model.CompilationUnits)
             {
+                var source = _codeCompiler.Compile(
+                    compilationUnit.Value);
+
                 _sourceWriter.Write(
                     compilationUnit.Key,
-                    compilationUnit.Value);
+                    source);
             }
         }
     }

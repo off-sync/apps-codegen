@@ -35,22 +35,30 @@
   * `IModelParser`
     * `ApplicationModel` Parse(`string` input)
   * `ICodeGenerator<TCompilationUnit>`
-    * `TCompilationUnit` GenerateCommand(`Command` command)
-    * `TCompilationUnit` GenerateQuery(`Query` query)
-    * `TCompilationUnit` GenerateClass(`Class` @class)
-    * `TCompilationUnit` GenerateInterface(`Interface` @interface)
+    * `TCompilationUnit` GenerateCommand(`string` namespace, `Command` command)
+    * `TCompilationUnit` GenerateQuery(`string` namespace, `Query` query)
+    * `TCompilationUnit` GenerateClass(`string` namespace, `Class` @class)
+    * `TCompilationUnit` GenerateInterface(`string` namespace, `Interface` @interface)
+  * `ICodeCompiler<TCompilationUnit>`
+    * `string` Compile(`TCompilationUnit` compilationUnit)
   * `ISourcePathStrategy`
     * `string` GetBasePathForDomain(`ApplicationModel` applicationModel, `AggregateRoot` aggregateRoot)
     * `string` GetBasePathForCommand(`ApplicationModel` applicationModel, `AggregateRoot` aggregateRoot, `Command` command)
     * `string` GetBasePathForQuery(`ApplicationModel` applicationModel, `AggregateRoot` aggregateRoot, `Query` query)
     * `string` GetPathForInterface(`ApplicationModel` applicationModel, `Interface` @interface)
-  * `ISourceWriter<TCompilationUnit>`
-    * `void` Write(`string` path, `TCompilationUnit` source)
+  * `ISourceWriter`
+    * `void` Write(`string` path, `string` source)
 
 ## OffSync.Apps.Codegen.Infra.PlantUml
 
 * `PlantUmlAntlrModelParser`
 
+## OffSync.Apps.Codegen.Infra.Roslyn
+
+* `RoslynCodeGenerator`
+* `RoslynCodeCompiler`
+
 ## OffSync.Apps.Codegen.Infra.EnvDte
 
+* `EnvDteSourcePathStrategy`
 * `EnvDteSourceWriter`

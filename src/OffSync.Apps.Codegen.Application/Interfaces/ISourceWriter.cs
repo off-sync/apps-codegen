@@ -1,9 +1,9 @@
 ﻿namespace OffSync.Apps.Codegen.Application.Interfaces
 {
-    public interface ISourceWriter<in TCompilationUnit>
+    public interface ISourceWriter
     {
         void Write(
             string path,
-            TCompilationUnit compilationUnit);
+            string source);
     }
 }
