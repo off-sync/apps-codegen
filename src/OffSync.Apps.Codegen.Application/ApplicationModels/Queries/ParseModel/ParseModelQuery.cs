@@ -23,7 +23,7 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.ParseModel
 
             return new ParseModelResult()
             {
-                ApplicationModel = applicationModel,
+                Application = applicationModel,
             };
         }
     }

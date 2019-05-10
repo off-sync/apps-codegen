@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 
+using OffSync.Apps.Codegen.Domain.CodeModels;
+
 namespace OffSync.Apps.Codegen.Application.ApplicationModels.Commands.WriteSource
 {
     public sealed class WriteSourceModel<TCompilationUnit>
     {
-        public IReadOnlyDictionary<string, TCompilationUnit> CompilationUnits { get; set; }
+        public IEnumerable<CodeModel<TCompilationUnit>> Code { get; set; }
     }
 }

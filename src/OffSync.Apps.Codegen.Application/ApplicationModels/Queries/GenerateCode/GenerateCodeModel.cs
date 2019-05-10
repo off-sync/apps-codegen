@@ -7,6 +7,6 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
     public sealed class GenerateCodeModel
     {
         [Required]
-        public ApplicationModel ApplicationModel { get; set; }
+        public ApplicationModel Application { get; set; }
     }
 }

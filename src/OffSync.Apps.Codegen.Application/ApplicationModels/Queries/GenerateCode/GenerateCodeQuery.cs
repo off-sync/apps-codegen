@@ -11,55 +11,46 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
     public sealed class GenerateCodeQuery<TCompilationUnit> :
         AbstractQuery<GenerateCodeModel, GenerateCodeResult<TCompilationUnit>>
     {
-        private readonly ISourcePathStrategy _sourcePathStrategy;
-
         private readonly ICodeGenerator<TCompilationUnit> _codeGenerator;
 
         public GenerateCodeQuery(
-            ISourcePathStrategy sourcePathStrategy,
             ICodeGenerator<TCompilationUnit> codeGenerator)
         {
-            _sourcePathStrategy = sourcePathStrategy ?? throw new ArgumentNullException(nameof(sourcePathStrategy));
             _codeGenerator = codeGenerator ?? throw new ArgumentNullException(nameof(codeGenerator));
         }
 
         protected override GenerateCodeResult<TCompilationUnit> InternalExecute(
             GenerateCodeModel model)
         {
-            var compilationUnits = new Dictionary<string, TCompilationUnit>();
+            var code = new List<CodeModel<TCompilationUnit>>();
 
-            foreach (var aggregateRoot in model.ApplicationModel.AggregateRoots)
+            foreach (var aggregateRoot in model.Application.AggregateRoots)
             {
-                GenerateAggregateRootCode(
-                    model.ApplicationModel,
-                    aggregateRoot,
-                    compilationUnits);
+                code.AddRange(
+                    GenerateAggregateRootCode(
+                        model.Application,
+                        aggregateRoot));
             }
 
-            foreach (var @interface in model.ApplicationModel.Interfaces)
+            foreach (var @interface in model.Application.Interfaces)
             {
-                GenerateInterfaceCode(
-                    model.ApplicationModel,
-                    @interface,
-                    compilationUnits);
+                code.AddRange(
+                    GenerateInterfaceCode(
+                        model.Application,
+                        @interface));
             }
 
             return new GenerateCodeResult<TCompilationUnit>()
             {
-                CompilationUnits = compilationUnits,
+                Code = code,
             };
         }
 
-        private void GenerateAggregateRootCode(
+        private IEnumerable<CodeModel<TCompilationUnit>> GenerateAggregateRootCode(
             ApplicationModel applicationModel,
-            AggregateRoot aggregateRoot,
-            Dictionary<string, TCompilationUnit> compilationUnits)
+            AggregateRoot aggregateRoot)
         {
             #region Domain
-            var domainPath = _sourcePathStrategy.GetBasePathForDomain(
-                applicationModel,
-                aggregateRoot);
-
             var domainNamespace = $"{applicationModel.Namespace}.Domain.{aggregateRoot.Name}";
 
             foreach (var domain in aggregateRoot.Domain)
@@ -68,20 +59,18 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
                     domainNamespace,
                     domain);
 
-                compilationUnits.Add(
-                    domainPath + domain.Name,
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = domainNamespace,
+                    Name = domain.Name,
+                    CompilationUnit = compilationUnit,
+                };
             }
             #endregion
 
             #region Commands
             foreach (var command in aggregateRoot.Commands)
             {
-                var commandPath = _sourcePathStrategy.GetBasePathForCommand(
-                    applicationModel,
-                    aggregateRoot,
-                    command);
-
                 var commandNamespace = $"{applicationModel.Namespace}.Application.{aggregateRoot.Name}.Commands.{command.Name}";
 
                 // command
@@ -89,18 +78,26 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
                     commandNamespace,
                     command);
 
-                compilationUnits.Add(
-                    commandPath + command.Name + "Command",
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = commandNamespace,
+                    Name = command.Name + "Command",
+                    CompilationUnit = compilationUnit,
+                };
+
+                // TODO command boilerplate
 
                 // model
                 compilationUnit = _codeGenerator.GenerateClass(
                     commandNamespace,
                     command.Model);
 
-                compilationUnits.Add(
-                    commandPath + command.Name + "Model",
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = commandNamespace,
+                    Name = command.Name + "Model",
+                    CompilationUnit = compilationUnit,
+                };
 
                 if (command.Result != null)
                 {
@@ -109,9 +106,12 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
                         commandNamespace,
                         command.Model);
 
-                    compilationUnits.Add(
-                        commandPath + command.Name + "Result",
-                        compilationUnit);
+                    yield return new CodeModel<TCompilationUnit>()
+                    {
+                        Namespace = commandNamespace,
+                        Name = command.Name + "Result",
+                        CompilationUnit = compilationUnit,
+                    };
                 }
 
                 // TODO config
@@ -121,11 +121,6 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
             #region Queries
             foreach (var query in aggregateRoot.Queries)
             {
-                var queryPath = _sourcePathStrategy.GetBasePathForQuery(
-                    applicationModel,
-                    aggregateRoot,
-                    query);
-
                 var queryNamespace = $"{applicationModel.Namespace}.Application.{aggregateRoot.Name}.Queries.{query.Name}";
 
                 // query
@@ -133,49 +128,60 @@ namespace OffSync.Apps.Codegen.Application.ApplicationModels.Queries.GenerateCod
                     queryNamespace,
                     query);
 
-                compilationUnits.Add(
-                    queryPath + query.Name + "Query",
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = queryNamespace,
+                    Name = query.Name + "Query",
+                    CompilationUnit = compilationUnit,
+                };
+
+                // TODO query boilerplate
 
                 // model
                 compilationUnit = _codeGenerator.GenerateClass(
                     queryNamespace,
                     query.Model);
 
-                compilationUnits.Add(
-                    queryPath + query.Name + "Model",
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = queryNamespace,
+                    Name = query.Name + "Model",
+                    CompilationUnit = compilationUnit,
+                };
 
                 // result
                 compilationUnit = _codeGenerator.GenerateClass(
                     queryNamespace,
                     query.Model);
 
-                compilationUnits.Add(
-                    queryPath + query.Name + "Result",
-                    compilationUnit);
+                yield return new CodeModel<TCompilationUnit>()
+                {
+                    Namespace = queryNamespace,
+                    Name = query.Name + "Result",
+                    CompilationUnit = compilationUnit,
+                };
 
                 // TODO config
             }
             #endregion
         }
 
-        private void GenerateInterfaceCode(
+        private IEnumerable<CodeModel<TCompilationUnit>> GenerateInterfaceCode(
             ApplicationModel applicationModel,
-            Interface @interface,
-            Dictionary<string, TCompilationUnit> compilationUnits)
+            Interface @interface)
         {
-            var path = _sourcePathStrategy.GetBasePathForInterface(
-                applicationModel,
-                @interface);
+            var @namespace = $"{applicationModel.Namespace}.Interfaces";
 
             var compilationUnit = _codeGenerator.GenerateInterface(
-                $"{applicationModel.Namespace}.Interfaces",
+                @namespace,
                 @interface);
 
-            compilationUnits.Add(
-                path + @interface.Name,
-                compilationUnit);
+            yield return new CodeModel<TCompilationUnit>()
+            {
+                Namespace = @namespace,
+                Name = @interface.Name,
+                CompilationUnit = compilationUnit,
+            };
         }
     }
 }

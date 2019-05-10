@@ -16,8 +16,8 @@ namespace OffSync.Apps.Codegen.Domain.ApplicationModels
         public Class Model { get; set; }
 
         /// <summary>
-        /// Optional Config object definition.
+        /// Optional Config definition. Must only contain properties.
         /// </summary>
-        public Class Config { get; set; }
+        public Interface Config { get; set; }
     }
 }
