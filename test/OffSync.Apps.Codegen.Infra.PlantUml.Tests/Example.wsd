@@ -1,0 +1,50 @@
+@startuml
+
+title OffSync.Tooling.Applications.Example
+
+namespace Examples {
+
+    namespace Domain {
+
+        class Example {
+            int Id
+            string Name
+        }
+
+    }
+
+    namespace Commands {
+
+        namespace CreateExample {
+            class Model {
+                string Name
+            }
+
+            class Result {
+                int Id
+            }
+
+            Interfaces.IRepository --> Command
+        }
+    }
+
+    namespace Queries {
+        namespace GetExamples {
+            class Result {
+                IQueryable<Examples.Domain.Example> Examples
+            }
+
+            Interfaces.IRepository --> Query
+        }
+    }
+}
+
+namespace Interfaces {
+
+    interface IRepository {
+        int Create(string name)
+        IQueryable<Examples.Domain.Example> FindAll()
+    }
+}
+
+@enduml

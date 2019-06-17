@@ -10,7 +10,7 @@ namespace OffSync.Apps.Codegen.Domain.ApplicationModels
         public string Name { get; set; }
 
         [Required]
-        public Interface[] Dependencies { get; set; }
+        public string[] Dependencies { get; set; }
 
         [Required]
         public Class Model { get; set; }
@@ -18,6 +18,6 @@ namespace OffSync.Apps.Codegen.Domain.ApplicationModels
         /// <summary>
         /// Optional Config definition. Must only contain properties.
         /// </summary>
-        public Interface Config { get; set; }
+        public Class Config { get; set; }
     }
 }

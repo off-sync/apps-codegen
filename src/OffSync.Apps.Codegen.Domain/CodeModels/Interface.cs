@@ -9,12 +9,5 @@ namespace OffSync.Apps.Codegen.Domain.CodeModels
 
         [Required]
         public Method[] Methods { get; set; }
-
-        /// <summary>
-        /// Properties on interfaces are implemented with only a getter. 
-        /// This can be used for Config definitions for example.
-        /// </summary>
-        [Required]
-        public NamedType[] Properties { get; set; }
     }
 }
