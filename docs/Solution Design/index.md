@@ -34,6 +34,8 @@
 * Interfaces
   * `IModelParser`
     * `ApplicationModel` Parse(`string` input)
+  * `ITypeResolver`
+    * `Type` Resolve(`ApplicationModel` application, `string` type)
   * `ICodeGenerator<TCompilationUnit>`
     * `TCompilationUnit` GenerateCommand(`string` namespace, `Command` command)
     * `TCompilationUnit` GenerateQuery(`string` namespace, `Query` query)

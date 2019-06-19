@@ -1,6 +1,6 @@
 @startuml
 
-title OffSync.Tooling.Applications.Example
+title OffSync.Apps.CodeGen.Example
 
 namespace Examples {
 
@@ -30,6 +30,10 @@ namespace Examples {
 
     namespace Queries {
         namespace GetExamples {
+            class Query {
+
+            }
+
             class Result {
                 IQueryable<Examples.Domain.Example> Examples
             }

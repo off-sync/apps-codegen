@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OffSync.Apps.Codegen.Domain.CodeModels
 {
@@ -12,7 +11,7 @@ namespace OffSync.Apps.Codegen.Domain.CodeModels
         /// If the ReturnType is null, this means that the method does not return
         /// a value. (I.e. is a void method.)
         /// </summary>
-        public Type ReturnType { get; set; }
+        public string ReturnType { get; set; }
 
         [Required]
         public NamedType[] Parameters { get; set; }

@@ -24,7 +24,11 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Tests
         [Test]
         public void Parse()
         {
-            _sut.Parse(_input);
+            var application = _sut.Parse(_input);
+
+            Assert.That(
+                application.Namespace,
+                Is.EqualTo("OffSync.Apps.CodeGen.Example"));
         }
     }
 }

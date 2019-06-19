@@ -3,92 +3,187 @@ using System.Linq;
 
 namespace OffSync.Apps.Codegen.Infra.PlantUml.Antlr
 {
+    public interface IApplicationContext
+    {
+        string Title { get; }
+
+        IEnumerable<IAggregateRootContext> AggregateRoots { get; }
+
+        IEnumerable<IInterfaceDefContext> Interfaces { get; }
+    }
+
+    public interface IAggregateRootContext
+    {
+        string Name { get; }
+
+        IEnumerable<IClassDefContext> Domain { get; }
+
+        IEnumerable<ICommandContext> Commands { get; }
+
+        IEnumerable<IQueryContext> Queries { get; }
+    }
+
+    public interface ICommandContext
+    {
+        string Name { get; }
+
+        IEnumerable<IPropertyContext> ModelProperties { get; }
+
+        IEnumerable<IPropertyContext> ResultProperties { get; }
+
+        IEnumerable<string> Dependencies { get; }
+
+        IEnumerable<IPropertyContext> ConfigProperties { get; }
+    }
+
+    public interface IQueryContext
+    {
+        string Name { get; }
+
+        IEnumerable<IPropertyContext> ModelProperties { get; }
+
+        IEnumerable<IPropertyContext> ResultProperties { get; }
+
+        IEnumerable<string> Dependencies { get; }
+
+        IEnumerable<IPropertyContext> ConfigProperties { get; }
+    }
+
+    public interface IClassDefContext
+    {
+        string Name { get; }
+
+        IEnumerable<IPropertyContext> Properties { get; }
+    }
+
+    public interface IInterfaceDefContext
+    {
+        string Name { get; }
+
+        IEnumerable<IMethodContext> Methods { get; }
+    }
+
+    public interface IPropertyContext
+    {
+        string Name { get; }
+
+        string Type { get; }
+    }
+
+    public interface IMethodContext
+    {
+        string Name { get; }
+
+        /// <summary>
+        /// ReturnType is null when the return type is void.
+        /// </summary>
+        string ReturnType { get; }
+
+        IEnumerable<IParameterContext> Parameters { get; }
+    }
+
+    public interface IParameterContext
+    {
+        string Name { get; }
+
+        string Type { get; }
+    }
+
     public partial class ApplicationsParser
     {
-        public partial class ApplicationContext
+        public partial class ApplicationContext :
+            IApplicationContext
         {
             public string Title => title().title_.GetText();
 
-            public IEnumerable<AggregateRootContext> AggregateRoots => aggregateRoots()?.aggregateRoot() ?? Enumerable.Empty<AggregateRootContext>();
+            public IEnumerable<IAggregateRootContext> AggregateRoots => aggregateRoots()?.aggregateRoot() ?? Enumerable.Empty<AggregateRootContext>();
 
-            public IEnumerable<InterfaceDefContext> Interfaces => interfaces()?.interfaceDefs().interfaceDef() ?? Enumerable.Empty<InterfaceDefContext>();
+            public IEnumerable<IInterfaceDefContext> Interfaces => interfaces()?.interfaceDefs().interfaceDef() ?? Enumerable.Empty<InterfaceDefContext>();
         }
 
-        public partial class AggregateRootContext
+        public partial class AggregateRootContext :
+            IAggregateRootContext
         {
             public string Name => name_.GetText();
 
-            public IEnumerable<ClassDefContext> Domain => domain().classDefs().classDef() ?? Enumerable.Empty<ClassDefContext>();
+            public IEnumerable<IClassDefContext> Domain => domain().classDefs().classDef() ?? Enumerable.Empty<ClassDefContext>();
 
-            public IEnumerable<CommandContext> Commands => commands()?.command() ?? Enumerable.Empty<CommandContext>();
+            public IEnumerable<ICommandContext> Commands => commands()?.command() ?? Enumerable.Empty<CommandContext>();
 
-            public IEnumerable<QueryContext> Queries => queries()?.query() ?? Enumerable.Empty<QueryContext>();
+            public IEnumerable<IQueryContext> Queries => queries()?.query() ?? Enumerable.Empty<QueryContext>();
         }
 
-        public partial class CommandContext
+        public partial class CommandContext :
+            ICommandContext
         {
             public string Name => name_.GetText();
 
-            public IEnumerable<PropertyContext> ModelProperties => modelClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ModelProperties => modelClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
 
-            public IEnumerable<PropertyContext> ResultProperties => resultClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ResultProperties => resultClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
 
             public IEnumerable<string> Dependencies => dependencies()?.dependency().Select(d => d.type_.GetText()) ?? Enumerable.Empty<string>();
 
-            public IEnumerable<PropertyContext> ConfigProperties => configClassDef().classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ConfigProperties => configClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
         }
 
-        public partial class QueryContext
+        public partial class QueryContext :
+            IQueryContext
         {
             public string Name => name_.GetText();
 
-            public IEnumerable<PropertyContext> ModelProperties => modelClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ModelProperties => modelClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
 
-            public IEnumerable<PropertyContext> ResultProperties => resultClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ResultProperties => resultClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
 
             public IEnumerable<string> Dependencies => dependencies()?.dependency().Select(d => d.type_.GetText()) ?? Enumerable.Empty<string>();
 
-            public IEnumerable<PropertyContext> ConfigProperties => configClassDef().classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> ConfigProperties => configClassDef()?.classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
         }
 
-        public partial class ClassDefContext
+        public partial class ClassDefContext :
+            IClassDefContext
         {
             public string Name => name_.GetText();
 
-            public IEnumerable<PropertyContext> Properties => classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
+            public IEnumerable<IPropertyContext> Properties => classBody().properties()?.property() ?? Enumerable.Empty<PropertyContext>();
         }
 
-        public partial class InterfaceDefContext
+        public partial class InterfaceDefContext :
+            IInterfaceDefContext
         {
             public string Name => name_.GetText();
 
-            public IEnumerable<MethodContext> Methods => methods().method();
+            public IEnumerable<IMethodContext> Methods => methods().method();
         }
 
-        public partial class PropertyContext
+        public partial class PropertyContext :
+            IPropertyContext
         {
-            public TypeContext Type => type();
-
             public string Name => name_.GetText();
+
+            public string Type => type().GetText();
         }
 
-        public partial class MethodContext
+        public partial class MethodContext :
+            IMethodContext
         {
+            public string Name => name_.GetText();
+
             /// <summary>
             /// ReturnType is null when the return type is void.
             /// </summary>
-            public TypeContext ReturnType => returnType_.type();
+            public string ReturnType => returnType_.type()?.GetText();
 
-            public string Name => name_.GetText();
-
-            public IEnumerable<ParameterContext> Parameters => parameters()?.parameter() ?? Enumerable.Empty<ParameterContext>();
+            public IEnumerable<IParameterContext> Parameters => parameters()?.parameter() ?? Enumerable.Empty<ParameterContext>();
         }
 
-        public partial class ParameterContext
+        public partial class ParameterContext :
+            IParameterContext
         {
-            public TypeContext Type => type();
-
             public string Name => name_.GetText();
+
+            public string Type => type().GetText();
         }
     }
 }

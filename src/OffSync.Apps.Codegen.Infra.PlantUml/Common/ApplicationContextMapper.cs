@@ -4,6 +4,7 @@ using System.Linq;
 
 using OffSync.Apps.Codegen.Domain.ApplicationModels;
 using OffSync.Apps.Codegen.Domain.CodeModels;
+using OffSync.Apps.Codegen.Infra.PlantUml.Antlr;
 using OffSync.Mapping.Mappert;
 
 using static OffSync.Apps.Codegen.Infra.PlantUml.Antlr.ApplicationsParser;
@@ -11,7 +12,7 @@ using static OffSync.Apps.Codegen.Infra.PlantUml.Antlr.ApplicationsParser;
 namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
 {
     public class ApplicationContextMapper :
-        Mapper<ApplicationContext, ApplicationModel>
+        Mapper<IApplicationContext, ApplicationModel>
     {
         private const string ModelClassName = "Model";
 
@@ -25,15 +26,9 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
                 .To(m => m.Namespace);
 
             #region Code Models
-            var propertyMapper = new Mapper<PropertyContext, NamedType>(
-                b =>
-                {
-                    b.Map(c => c.Type)
-                        .To(m => m.Type)
-                        .Using(ResolveType);
-                });
+            var propertyMapper = new Mapper<IPropertyContext, NamedType>();
 
-            var classMapper = new Mapper<ClassDefContext, Class>(
+            var classMapper = new Mapper<IClassDefContext, Class>(
                 b =>
                 {
                     b.MapItems(c => c.Properties)
@@ -41,27 +36,17 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
                         .Using(propertyMapper.Map);
                 });
 
-            var parameterMapper = new Mapper<ParameterContext, NamedType>(
+            var parameterMapper = new Mapper<IParameterContext, NamedType>();
+
+            var methodMapper = new Mapper<IMethodContext, Method>(
                 b =>
                 {
-                    b.Map(c => c.Type)
-                        .To(m => m.Type)
-                        .Using(ResolveType);
-                });
-
-            var methodMapper = new Mapper<MethodContext, Method>(
-                b =>
-                {
-                    b.Map(c => c.ReturnType)
-                        .To(m => m.ReturnType)
-                        .Using(ResolveType);
-
                     b.MapItems(c => c.Parameters)
                         .To(m => m.Parameters)
                         .Using(parameterMapper.Map);
                 });
 
-            var interfaceMapper = new Mapper<InterfaceDefContext, Interface>(
+            var interfaceMapper = new Mapper<IInterfaceDefContext, Interface>(
                 b =>
                 {
                     b.MapItems(c => c.Methods)
@@ -71,7 +56,7 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
             #endregion
 
             #region Aggregate Roots
-            var commandMapper = new Mapper<CommandContext, Command>(
+            var commandMapper = new Mapper<ICommandContext, Command>(
                 b =>
                 {
                     b.Map(c => c.ModelProperties)
@@ -112,7 +97,7 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
                                 });
                 });
 
-            var queryMapper = new Mapper<QueryContext, Query>(
+            var queryMapper = new Mapper<IQueryContext, Query>(
                 b =>
                 {
                     b.Map(c => c.ModelProperties)
@@ -151,7 +136,7 @@ namespace OffSync.Apps.Codegen.Infra.PlantUml.Common
                                 });
                 });
 
-            var aggregateRootMapper = new Mapper<AggregateRootContext, AggregateRoot>(
+            var aggregateRootMapper = new Mapper<IAggregateRootContext, AggregateRoot>(
                 b =>
                 {
                     b.MapItems(c => c.Domain)
